@@ -14,3 +14,7 @@ mv -f configure.save configure
 rm -rf autom4te.cache
 rm -f auto/config.status auto/config.cache
 
+pushd mac/PSMTabBarControl
+xcodebuild
+popd
+
