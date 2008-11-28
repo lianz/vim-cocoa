@@ -1133,7 +1133,7 @@ char_u *gui_mch_browse(
     } else
     {
         NSOpenPanel *panel = [NSOpenPanel openPanel];
-        
+
         [panel setTitle: NSStringFromVim(title)];
         [panel setAllowsMultipleSelection: NO];
 
@@ -1568,13 +1568,13 @@ void gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
 #endif
     left = FILL_X(gui.col);
 
-    rect = NSMakeRect(left, FF_Y(gui.row + 2) + h, w, h);
+    rect = NSMakeRect(left, FF_Y(gui.row + 1), w, h);
 
     gui_mac_begin_drawing();
     [NSColorFromGuiColor(color, 1.0) set];
-    // gui_mac_msg(MSG_DEBUG, @"rect = %g %g %g %g", 
-    //      rect.origin.x, rect.origin.y, 
-    //      rect.size.width, rect.size.height);
+    // gui_mac_msg(MSG_DEBUG, @"rect = %g %g %g %g",
+    //            rect.origin.x, rect.origin.y,
+    //            rect.size.width, rect.size.height);
     [NSBezierPath fillRect: rect];
     gui_mac_end_drawing();
 }
