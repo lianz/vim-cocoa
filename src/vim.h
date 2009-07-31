@@ -91,6 +91,7 @@
 #endif
 #if defined(MACOS_X_UNIX)
 # define MACOS_X
+# define FEAT_CLIPBOARD
 # ifndef HAVE_CONFIG_H
 #  define UNIX
 # endif
