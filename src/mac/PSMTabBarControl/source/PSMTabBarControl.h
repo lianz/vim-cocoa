@@ -39,7 +39,13 @@ enum {
     PSMTab_PositionSingleMask		= 1 << 7
 };
 
-@interface PSMTabBarControl : NSControl <NSTabViewDelegate> {
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1060
+#define EXTRA_DELEGATE <NSTabViewDelegate>
+#else
+#define EXTRA_DELEGATE
+#endif
+
+@interface PSMTabBarControl : NSControl EXTRA_DELEGATE {
     
     // control basics
     NSMutableArray              *_cells;                    // the cells that draw the tabs
