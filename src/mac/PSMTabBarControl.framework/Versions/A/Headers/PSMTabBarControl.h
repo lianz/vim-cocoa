@@ -42,7 +42,7 @@ enum {
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= 1060
 #define EXTRA_DELEGATE <NSTabViewDelegate>
 #else
-#define EXTRA_DELEGATE
+#define EXTRA_DELEGATE 
 #endif
 
 @interface PSMTabBarControl : NSControl EXTRA_DELEGATE {
