@@ -245,8 +245,8 @@ struct gui_mac_drawing_op {
 };
 
 struct gui_mac_data {
-    NSColor    *fg_color, *bg_color, *sp_color;
-    
+    NSColor    *fg_color, *bg_color, *sp_color, *clear_color;
+
     VIMWindow   *current_window;
 
     NSFont     *current_font;
@@ -459,6 +459,7 @@ int gui_mch_init()
     gui_mac.selecting_tab  = NO;
     gui_mac.window_opened  = NO;
     gui_mac.queued_ops     = 0;
+    gui_mac.clear_color    = [[NSColor whiteColor] retain];
 
     return OK;
 }
@@ -550,8 +551,30 @@ void gui_mch_set_shellsize(
 
 void gui_mch_set_text_area_pos(int x, int y, int w, int h)
 {
+    NSWindow *window = gui_mac.current_window;
+    NSRect rect = [[window contentView] frame];
+    int height = rect.size.height, width = rect.size.width;
+    int exph, expw;
+
+    expw = x + w + (gui.which_scrollbars[SBAR_RIGHT] ? gui.scrollbar_width : 0);
+    exph = y + h + (gui.which_scrollbars[SBAR_BOTTOM] ? gui.scrollbar_height : 0);
+
     gui_mac_msg(MSG_INFO, @"gui_mch_set_text_area_pos: "
-                "%d, %d, %d, %d", x, y, w, h);
+                "%d, %d, %d, %d, height = %d, exph = %d, w = %d, expw = %d",
+                x, y, w, h, height, exph, width, expw);
+
+    if (height > exph || width > expw)
+    {
+        rect.size.width = expw;
+        rect.size.height = exph;
+
+        NSRect frame = [window frameRectForContentRect: rect];
+        NSRect visibleFrame = [[NSScreen mainScreen] visibleFrame];
+
+        frame.origin.y = visibleFrame.origin.y + visibleFrame.size.height - frame.origin.y;
+
+        [window setFrame: frame display: NO];
+    }
 
     NSRect viewRect = NSMakeRect(x, y, w, h);
     // If we don't have a text view yet, allocate it first
@@ -1539,7 +1562,7 @@ void gui_mch_set_fg_color(guicolor_T color)
 void gui_mch_set_bg_color(guicolor_T color)
 {
     gui_mac.bg_color = NSColorFromGuiColor(color, VIM_BG_ALPHA);
-    
+
     // TODO: should set for all views
     [currentView setMarkedTextAttribute: gui_mac.bg_color
                                  forKey: NSBackgroundColorAttributeName];
@@ -1655,6 +1678,9 @@ void gui_mch_flash(int msec)
 void gui_mch_clear_all()
 {
     gui_mac_queue_op(CLEAR_ALL);
+    [gui_mac.clear_color release];
+    gui_mac.clear_color = NSColorFromGuiColor(gui.back_pixel, VIM_BG_ALPHA);
+    [gui_mac.clear_color retain];
 }
 
 void gui_mac_clear_all(guicolor_T back_pixel)
@@ -2594,7 +2620,7 @@ finish:
     width  = (int) size.width;
     height = (int) size.height;
 
-    // gui_mac_msg(MSG_DEBUG, @"windowDidResize: (%d, %d)", width, height);
+    gui_mac_msg(MSG_INFO, @"windowDidResize: (%d, %d)", width, height);
     gui_resize_shell(width, height);
 
     gui_mac_update();
@@ -2790,7 +2816,7 @@ void gui_mac_open_window()
 
 - (void) drawRect:(NSRect)rect
 {
-    [[NSColor whiteColor] set];
+    [gui_mac.clear_color set];
     NSRectFill(rect);
 }
 
