@@ -1095,7 +1095,7 @@ win_split_ins(size, flags, newwin, dir)
      */
     redraw_win_later(wp, NOT_VALID);
     wp->w_redr_status = TRUE;
-    redraw_win_later(oldwin, NOT_VALID);
+    redraw_win_later(oldwin, CLEAR);
     oldwin->w_redr_status = TRUE;
 
     if (need_status)
@@ -5614,7 +5614,7 @@ win_new_width(wp, width)
 	update_topline();
 	curs_columns(TRUE);	/* validate w_wrow */
     }
-    redraw_win_later(wp, NOT_VALID);
+    redraw_win_later(wp, CLEAR);
     wp->w_redr_status = TRUE;
 }
 #endif
